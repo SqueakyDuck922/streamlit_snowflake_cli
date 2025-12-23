@@ -1,0 +1,16 @@
+definition_version: '2'
+entities:
+  streamlit_snowflake_cli:
+    type: streamlit
+    identifier:
+      name: streamlit_snowflake_cli
+    main_file: streamlit_app.py
+    pages_dir: pages
+    query_warehouse: DEV_DEVELOPER_WH
+    stage: STAGE1
+    artifacts:
+      - streamlit_app.py
+      - environment.yml
+      - pages
+      - common/hello.py
+
