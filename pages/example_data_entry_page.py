@@ -37,9 +37,13 @@ with st.form('selection_form'):
 if submit_selection:
 
     if selected_parent is not None:
-        selected_parent_id = taxo_table.filter(taxo_table.col('name')== selected_parent).to_pandas().values.tolist()[0][0]
 
-        subcategories = taxo_table.filter(taxo_table.col('parent_id') == selected_parent_id).to_pandas()
+        with st.form("data_entry_form"):
 
+            selected_parent_id = taxo_table.filter(taxo_table.col('name')== selected_parent).to_pandas().values.tolist()[0][0]
 
-        st.write(subcategories)
+            subcategories = taxo_table.filter(taxo_table.col('parent_id') == selected_parent_id).to_pandas()
+
+            st.write(subcategories)
+
+            submit_data_entry_form = st.form_submit_button('save data entry')
