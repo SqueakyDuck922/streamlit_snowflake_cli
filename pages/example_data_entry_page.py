@@ -44,6 +44,9 @@ with st.form('selection_form'):
 # +------------------+
 if submit_selection:
 
+    # Clear previous data entry state
+    del st.session_state["taxo_record_data"]
+
     if selected_parent is not None:
 
         with st.form("data_entry_form"):
