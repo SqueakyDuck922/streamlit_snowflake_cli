@@ -1,12 +1,13 @@
 import streamlit as st
+import common.functions as fc
+
 from common.hello import say_hello
 
 st.title(f"Example streamlit chicken app. {say_hello()}")
 
 
 
-st.write("chicken licken")
+if "snowflake_session" not in st.session_state:
+    st.session_state["snowflake_session"] = fc.get_session()
 
-
-
-st.text_input("what is chicken called?")
+session = st.session_state["snowflake_session"]

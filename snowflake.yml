@@ -13,4 +13,5 @@ entities:
       - environment.yml
       - pages
       - common/hello.py
+      - common/functinos.py
 
