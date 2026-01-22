@@ -12,7 +12,9 @@ session = st.session_state["snowflake_session"]
 taxo_table = session.table('schema1.taxo_categories')
 
 
-
+# +-------------------------+
+# |    Selection Section    |
+# +-------------------------+
 # categories = taxo_table.filter(taxo_table.col('parent_id') == selected_chapter_id).to_pandas()
 
 # st.write(parent_categories)
@@ -34,6 +36,11 @@ with st.form('selection_form'):
 
 
 
+
+
+# +------------------+
+# |    Data Entry    |
+# +------------------+
 if submit_selection:
 
     if selected_parent is not None:
