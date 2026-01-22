@@ -44,6 +44,8 @@ with st.form('selection_form'):
 # +------------------+
 if submit_selection:
 
+    st.write("debug: submit_selection")
+
     # Clear previous data entry state
     del st.session_state["taxo_record_data"]
 
