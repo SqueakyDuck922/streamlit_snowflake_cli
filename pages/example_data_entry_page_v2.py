@@ -36,6 +36,8 @@ taxo_table = session.table('schema1.taxo_categories')
 def selection_form_submit():
     """Callback for form1 submission"""
 
+
+
     # Store the selection
     st.session_state.persistent_data['selection_form_selection'] = st.session_state.selected_parent
 
@@ -98,6 +100,20 @@ def selection_form_submit():
     st.session_state.persistent_data['subcategory_options'] = subcategories['NAME'].tolist()
 
 
+
+
+def check_for_unsaved_changes():
+    """Check if there are unsaved changes in the data entry form"""
+    data_has_changed = False
+    if edited_data is not None and st.session_state.persistent_data['taxo_record_data'] is not None:
+        # Compare the edited data with the original data
+        data_has_changed = not edited_data.equals(
+            st.session_state.persistent_data['taxo_record_data']
+        )
+
+    return data_has_changed
+
+          
 
 
 with st.form('selection_form'):
@@ -178,6 +194,19 @@ if 'selection_form_selection' in st.session_state.persistent_data:
                 hide_index=True
             )
 
+            # Check if data has changed
+            # data_has_changed = False
+            # if edited_data is not None and st.session_state.persistent_data['taxo_record_data'] is not None:
+            #     # Compare the edited data with the original data
+            #     data_has_changed = not edited_data.equals(
+            #         st.session_state.persistent_data['taxo_record_data']
+            #     )
+            
+            # Display warning if there are unsaved changes
+            if check_for_unsaved_changes():
+                st.warning("⚠️ You have unsaved changes!")
+            else:
+                st.info("ℹ️ No changes detected")
 
             submit_data_entry_form = st.form_submit_button('save data entry')
 
