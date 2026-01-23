@@ -89,6 +89,10 @@ def selection_form_submit():
         st.session_state.persistent_data['taxo_record_data']= pd.DataFrame(pre_populated_rows)
 
 
+    # CRITICAL: Set forms_initialized to True here
+    # st.session_state.persistent_data['forms_initialized'] = True
+
+
 
     # Create dropdown options for relevant columns
     st.session_state.persistent_data['subcategory_options'] = subcategories['NAME'].tolist()
@@ -116,14 +120,22 @@ with st.form('selection_form'):
 
 
 
+st.write("after form 1")
+
+
 
 
 # +------------------+
 # |    Data Entry    |
 # +------------------+
-if submit_selection:
+
+# FORM 2 (conditionally shown)
+# if submit_selection:
+# if st.session_state.persistent_data['forms_initialized']:
+if 'selection_form_selection' in st.session_state.persistent_data:
 
     st.write("debug: submit_selection")
+    st.write(st.session_state.persistent_data['selection_form_selection'])
 
     # Clear previous data entry state
     # if 'taxo_record_data' in st.session_state:
@@ -133,56 +145,6 @@ if submit_selection:
 
         with st.form("data_entry_form"):
 
-            # selected_parent_id = taxo_table.filter(taxo_table.col('name')== selected_parent).to_pandas().values.tolist()[0][0]
-            # subcategories = taxo_table.filter(taxo_table.col('parent_id') == selected_parent_id).to_pandas()
-            # subcategory_ids = subcategories['ID'].tolist()
-            # subcategory_ids_str = ','.join(map(str, subcategory_ids))
-
-            # # st.write(subcategories)
-
-            # # Create dropdown options for relevant columns
-            # subcategory_options = subcategories['NAME'].tolist()
-
-            # # Initialize dataframe for data entry 
-            # if 'taxo_record_data' not in st.session_state:
-
-            #     ## Check for existing data entries ############################################
-
-            #     existing_data_loaded = False
-
-            #     if subcategory_ids_str:
-            #         existing_entries_query = f"""
-            #         select taxo_id, value1, value2
-            #         from v_taxo_records
-            #         where taxo_id in ({subcategory_ids_str})
-            #         """ 
-                
-            #         existing_entries = session.sql(existing_entries_query).to_pandas()
-
-            #         if len(existing_entries) > 0:
-
-            #             # TODO load existing entries into form fields
-            #             st.write("Existing entries found")
-
-            #     # If no existing data, pre-populate with one row per subcategory
-            #     if not existing_data_loaded:
-            #         pre_populated_rows = []
-            #         for _, subcategory_row in subcategories.iterrows():
-            #             subcategory_name = subcategory_row['NAME']
-
-            #             row_data = {
-            #                 'Subcategory': subcategory_name,
-            #                 'value1': None,
-            #                 'value2': None
-            #             }
-
-            #             pre_populated_rows.append(row_data)
-
-            #         st.session_state.taxo_record_data = pd.DataFrame(pre_populated_rows)
-
-
-
-            # TODO put back
 
             # Build column configuration
             column_config = {
@@ -218,3 +180,15 @@ if submit_selection:
 
 
             submit_data_entry_form = st.form_submit_button('save data entry')
+
+            if submit_data_entry_form:
+                st.write("Data entry submitted:")
+                # st.write(edited_data)
+
+                # Here you would typically save the edited_data to your database
+
+
+
+with st.expander("Debug - Session State"):
+    st.write("Current persistent_data:")
+    st.json(st.session_state.persistent_data)
