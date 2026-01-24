@@ -144,6 +144,9 @@ with st.form("entry_form"):
             subcategories = taxo_table.filter(taxo_table.col('parent_id') == st.session_state.selected_parent_id).to_pandas()
             subcategory_options = subcategories['NAME'].tolist()
 
+            # Create mapping dictionaries
+            subcategory_to_id = dict(zip(subcategories['NAME'], subcategories['ID']))
+
             # Build column configuration
             column_config = {
             "Subcategory": st.column_config.SelectboxColumn(
@@ -177,6 +180,66 @@ with st.form("entry_form"):
         )
 
         submit_data = st.form_submit_button('submit data')
+
+        if submit_data:
+            st.write("Submit Data:")
+
+            all_valid = True # might want to do some valiation here
+
+            # st.write(edited_data)
+
+            if all_valid:
+
+                updated_count = 0
+                inserted_count = 0
+
+                for i in range(len(edited_data)):
+                    # Get dimension values
+                    subcategory_name = edited_data.iloc[i]['Subcategory']
+                    value1 = edited_data.iloc[i]['value1']
+                    value2 = edited_data.iloc[i]['value2']
+                    taxon_id = subcategory_to_id[subcategory_name]
+                    # st.write(f"Row {i+1}: Subcategory={subcategory_name}, Value1={value1}, Value2={value2}, taxon_id={taxon_id}")
+
+
+
+
+                    # Check if record exists for this combination
+                    check_query = f"""
+                    SELECT record_id
+                    FROM taxo_records
+                    WHERE taxo_id = {taxon_id}
+                    """
+                    existing_record = session.sql(check_query).collect()
+
+                    if len(existing_record) > 0:
+                        # Update existing record
+                        record_id = existing_record[0]['RECORD_ID']
+                        update_query = f"""
+                        UPDATE taxo_records
+                        SET value1 = {value1}, value2 = '{value2}'
+                        WHERE record_id = {record_id}
+                        """
+                        session.sql(update_query).collect()
+                        updated_count += 1
+                    else:
+                        # Insert new record
+                        insert_query = f"""
+                        INSERT INTO taxo_records (taxo_id, value1, value2)
+                        VALUES ({taxon_id}, {value1}, '{value2}')
+                        """
+                        session.sql(insert_query).collect()
+                        inserted_count += 1
+
+
+                # Display results
+                success_msg = f"Update info:"
+                if updated_count > 0:
+                    success_msg += f" | Updated: {updated_count} record(s)"
+                if inserted_count > 0:
+                    success_msg += f" | Inserted: {inserted_count} record(s)"
+                st.success(success_msg)
+     
 
 # Reset button - positioned below the form
 if st.button("🔄 Reset Selection", type="secondary"):
