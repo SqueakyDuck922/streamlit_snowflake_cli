@@ -101,8 +101,8 @@ with st.form("entry_form"):
         if confirm_selection:
             st.write(f"Selected chapter: {selected_parent}")
 
-            selected_parent_id = taxo_table.filter(taxo_table.col('name')== selected_parent).to_pandas().values.tolist()[0][0]
-            load_editor_initial_data(selected_parent_id)
+            st.session_state.selected_parent_id = taxo_table.filter(taxo_table.col('name')== selected_parent).to_pandas().values.tolist()[0][0]
+            load_editor_initial_data(st.session_state.selected_parent_id)
 
             st.rerun()
 
@@ -110,7 +110,44 @@ with st.form("entry_form"):
         st.write("Step 2: Edit Your Data")
 
         if st.session_state.editor_initial_data is not None:
-            st.write(st.session_state.editor_initial_data)
+            # st.write(st.session_state.editor_initial_data)
+
+
+            # Create dropdown options for relevant columns
+            subcategories = taxo_table.filter(taxo_table.col('parent_id') == st.session_state.selected_parent_id).to_pandas()
+            subcategory_options = subcategories['NAME'].tolist()
+
+            # Build column configuration
+            column_config = {
+            "Subcategory": st.column_config.SelectboxColumn(
+                "Subcategory",
+                help="Select a subcategory",
+                options=subcategory_options,
+                required=True,
+                width="medium"
+            ),
+            "Value1": st.column_config.NumberColumn(
+                "Value1",
+                help="Enter an integer value for Value1",
+                required=True,
+                width="medium"
+            ),
+            "Value2": st.column_config.TextColumn(
+                "Value2",
+                help="Enter text value for Value2",
+                required=True,
+                width="medium"
+            )
+        }
+            
+        # Create the data editor
+        edited_data = st.data_editor(
+            st.session_state.editor_initial_data ,
+            column_config=column_config,
+            num_rows="dynamic",
+            use_container_width=True,
+            hide_index=True
+        )
 
         submit_data = st.form_submit_button('submit data')
     
