@@ -152,4 +152,18 @@ with st.form("entry_form"):
         )
 
         submit_data = st.form_submit_button('submit data')
+
+# Reset button - positioned below the form
+if st.button("🔄 Reset Selection", type="secondary"):
+    # Clear all session state variables related to the form
+    st.session_state.stage = "selection"
+    st.session_state.user_selections = {}
+    st.session_state.dataframe = None
+    if 'selected_parent' in st.session_state:
+        del st.session_state.selected_parent
+    if 'selected_parent_id' in st.session_state:
+        del st.session_state.selected_parent_id
+    if 'editor_initial_data' in st.session_state:
+        del st.session_state.editor_initial_data
+    st.rerun()
     
