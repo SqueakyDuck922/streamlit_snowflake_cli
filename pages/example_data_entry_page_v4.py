@@ -84,17 +84,15 @@ with st.form("entry_form"):
     # |    Selection Section    |
     # +-------------------------+
 
-    selected_parent = st.pills(
-        'Select a chapter:',
-        options=parent_categories['NAME'].tolist(),
-        key='selected_parent'
-        ) 
-    
-    
-
     if st.session_state.stage == "selection":
 
         st.write("Step 1: Select chapter and category")
+        
+        selected_parent = st.pills(
+            'Select a chapter:',
+            options=parent_categories['NAME'].tolist(),
+            key='selected_parent'
+        )
 
         confirm_selection = st.form_submit_button('confirm selection')
 
@@ -108,7 +106,11 @@ with st.form("entry_form"):
 
     else:
         st.write("Step 2: Edit Your Data")
-
+        
+        # Display the selected chapter as read-only
+        if 'selected_parent' in st.session_state and st.session_state.selected_parent:
+            st.info(f"📖 Selected Chapter: {st.session_state.selected_parent}")
+        
         if st.session_state.editor_initial_data is not None:
             # st.write(st.session_state.editor_initial_data)
 
