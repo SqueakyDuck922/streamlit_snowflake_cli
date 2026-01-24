@@ -50,10 +50,7 @@ def load_editor_initial_data(selected_parent_id):
     return pd.DataFrame(pre_populated_rows)
 
 
-
-
-st.title("Example Data Entry Page v3")
-
+st.title("Example Data Entry Page v4")
 st.write("May need to first go to streamlitapp page, then this page")
 
 
@@ -78,39 +75,18 @@ with st.form("entry_form"):
         options=parent_categories['NAME'].tolist(),
         key='selected_parent'
         ) 
+    
+    confirm_selection = st.form_submit_button('confirm selection')
 
-
-    selection_button = st.button("Confirm Selection")
-
-
-
-    if 'selected_parent_id' not in st.session_state:
-        st.write("selected_parent_id exists")
-    else:
-        st.write("selected_parent_id does not exist")
-
-
-
-    # +------------------+
-    # |    Data Entry    |
-    # +------------------+
-
-    if selection_button:
+    if confirm_selection:
+        st.write(f"Selected chapter: {selected_parent}")
 
         selected_parent_id = taxo_table.filter(taxo_table.col('name')== selected_parent).to_pandas().values.tolist()[0][0]
-
-        # This returns selected_parent despite having not stored it in session_state
-        st.write(f"You selected: {st.session_state.selected_parent}")
-        st.write(selected_parent_id)
-
-
-
+        
         # Create dropdown options for relevant columns
         subcategories = taxo_table.filter(taxo_table.col('parent_id') == selected_parent_id).to_pandas()
         subcategory_options = subcategories['NAME'].tolist()
 
-
-        # st.write(editor_initial_data)
 
         # Build column configuration
         column_config = {
@@ -145,7 +121,3 @@ with st.form("entry_form"):
             use_container_width=True,
             hide_index=True
         )
-
-
-    submit_data_entry_form = st.form_submit_button('save data entry')
-
