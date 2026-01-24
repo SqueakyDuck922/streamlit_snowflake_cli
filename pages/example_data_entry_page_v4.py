@@ -2,6 +2,14 @@ import streamlit as st
 import pandas as pd
 
 
+# Initialize session state
+if "stage" not in st.session_state:
+    st.session_state.stage = "selection"  # "selection" or "editor"
+if "user_selections" not in st.session_state:
+    st.session_state.user_selections = {}
+if "dataframe" not in st.session_state:
+    st.session_state.dataframe = None
+
 
 def load_editor_initial_data(selected_parent_id):
    
@@ -47,6 +55,9 @@ def load_editor_initial_data(selected_parent_id):
 
             pre_populated_rows.append(row_data)
 
+
+    st.session_state.stage = "editor"
+
     return pd.DataFrame(pre_populated_rows)
 
 
@@ -66,6 +77,8 @@ parent_categories = taxo_table.filter(taxo_table.col('parent_id') == 0).to_panda
 with st.form("entry_form"):
 
 
+    st.write("session_state.stage:", st.session_state.stage)
+
     # +-------------------------+
     # |    Selection Section    |
     # +-------------------------+
@@ -76,48 +89,22 @@ with st.form("entry_form"):
         key='selected_parent'
         ) 
     
-    confirm_selection = st.form_submit_button('confirm selection')
+    
 
-    if confirm_selection:
-        st.write(f"Selected chapter: {selected_parent}")
+    if st.session_state.stage == "selection":
 
-        selected_parent_id = taxo_table.filter(taxo_table.col('name')== selected_parent).to_pandas().values.tolist()[0][0]
-        
-        # Create dropdown options for relevant columns
-        subcategories = taxo_table.filter(taxo_table.col('parent_id') == selected_parent_id).to_pandas()
-        subcategory_options = subcategories['NAME'].tolist()
+        confirm_selection = st.form_submit_button('confirm selection')
 
+        if confirm_selection:
+            st.write(f"Selected chapter: {selected_parent}")
 
-        # Build column configuration
-        column_config = {
-            "Subcategory": st.column_config.SelectboxColumn(
-                "Subcategory",
-                help="Select a subcategory",
-                options=subcategory_options,
-                required=True,
-                width="medium"
-            ),
-            "Value1": st.column_config.NumberColumn(
-                "Value1",
-                help="Enter an integer value for Value1",
-                required=True,
-                width="medium"
-            ),
-            "Value2": st.column_config.TextColumn(
-                "Value2",
-                help="Enter text value for Value2",
-                required=True,
-                width="medium"
-            )
-        }
+            selected_parent_id = taxo_table.filter(taxo_table.col('name')== selected_parent).to_pandas().values.tolist()[0][0]
+            editor_initial_data = load_editor_initial_data(selected_parent_id)
 
-        editor_initial_data = load_editor_initial_data(selected_parent_id)
+            st.rerun()
 
-        # Create the data editor
-        edited_data = st.data_editor(
-            editor_initial_data,
-            column_config=column_config,
-            num_rows="dynamic",
-            use_container_width=True,
-            hide_index=True
-        )
+    else:
+        st.header("Step 2: Edit Your Data")
+
+        submit_data = st.form_submit_button('submit data')
+    
