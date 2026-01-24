@@ -81,6 +81,12 @@ selected_parent = st.pills(
 selection_button = st.button("Confirm Selection")
 
 
+
+
+# +------------------+
+# |    Data Entry    |
+# +------------------+
+
 if selection_button:
 
     selected_parent_id = taxo_table.filter(taxo_table.col('name')== selected_parent).to_pandas().values.tolist()[0][0]
@@ -89,6 +95,45 @@ if selection_button:
     st.write(f"You selected: {st.session_state.selected_parent}")
     st.write(selected_parent_id)
 
+
+
+    # Create dropdown options for relevant columns
+    subcategories = taxo_table.filter(taxo_table.col('parent_id') == selected_parent_id).to_pandas()
+    subcategory_options = subcategories['NAME'].tolist()
+
+
+    # st.write(editor_initial_data)
+
+    # Build column configuration
+    column_config = {
+        "Subcategory": st.column_config.SelectboxColumn(
+            "Subcategory",
+            help="Select a subcategory",
+            options=subcategory_options,
+            required=True,
+            width="medium"
+        ),
+        "Value1": st.column_config.NumberColumn(
+            "Value1",
+            help="Enter an integer value for Value1",
+            required=True,
+            width="medium"
+        ),
+        "Value2": st.column_config.TextColumn(
+            "Value2",
+            help="Enter text value for Value2",
+            required=True,
+            width="medium"
+        )
+    }
+
     editor_initial_data = load_editor_initial_data(selected_parent_id)
 
-    st.write(editor_initial_data)
+    # Create the data editor
+    edited_data = st.data_editor(
+        editor_initial_data,
+        column_config=column_config,
+        num_rows="dynamic",
+        use_container_width=True,
+        hide_index=True
+    )
