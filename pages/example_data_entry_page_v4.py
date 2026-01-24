@@ -2,6 +2,31 @@ import streamlit as st
 import pandas as pd
 
 
+# Dialog function for reset confirmation
+@st.dialog("⚠️ Confirm Reset", dismissible=False)
+def confirm_reset():
+    st.write("**Warning:** All unsaved edits will be lost!")
+    st.write("Are you sure you want to start over?")
+    
+    col1, col2 = st.columns(2)
+    with col1:
+        if st.button("❌ Cancel", use_container_width=True):
+            st.rerun()  # Close dialog without action
+    with col2:
+        if st.button("✅ Confirm Reset", type="primary", use_container_width=True):
+            # Clear all session state variables related to the form
+            st.session_state.stage = "selection"
+            st.session_state.user_selections = {}
+            st.session_state.dataframe = None
+            if 'selected_parent' in st.session_state:
+                del st.session_state.selected_parent
+            if 'selected_parent_id' in st.session_state:
+                del st.session_state.selected_parent_id
+            if 'editor_initial_data' in st.session_state:
+                del st.session_state.editor_initial_data
+            st.rerun()  # Close dialog and refresh app
+
+
 # Initialize session state
 if "stage" not in st.session_state:
     st.session_state.stage = "selection"  # "selection" or "editor"
@@ -155,15 +180,19 @@ with st.form("entry_form"):
 
 # Reset button - positioned below the form
 if st.button("🔄 Reset Selection", type="secondary"):
-    # Clear all session state variables related to the form
-    st.session_state.stage = "selection"
-    st.session_state.user_selections = {}
-    st.session_state.dataframe = None
-    if 'selected_parent' in st.session_state:
-        del st.session_state.selected_parent
-    if 'selected_parent_id' in st.session_state:
-        del st.session_state.selected_parent_id
-    if 'editor_initial_data' in st.session_state:
-        del st.session_state.editor_initial_data
-    st.rerun()
+    if st.session_state.stage == "editor":
+        # Show confirmation dialog when in editor mode
+        confirm_reset()
+    else:
+        # No confirmation needed in selection mode - reset directly
+        st.session_state.stage = "selection"
+        st.session_state.user_selections = {}
+        st.session_state.dataframe = None
+        if 'selected_parent' in st.session_state:
+            del st.session_state.selected_parent
+        if 'selected_parent_id' in st.session_state:
+            del st.session_state.selected_parent_id
+        if 'editor_initial_data' in st.session_state:
+            del st.session_state.editor_initial_data
+        st.rerun()
     
