@@ -56,9 +56,10 @@ def load_editor_initial_data(selected_parent_id):
             pre_populated_rows.append(row_data)
 
 
+    st.session_state.editor_initial_data = pd.DataFrame(pre_populated_rows)
     st.session_state.stage = "editor"
 
-    return pd.DataFrame(pre_populated_rows)
+    return 
 
 
 st.title("Example Data Entry Page v4")
@@ -93,18 +94,23 @@ with st.form("entry_form"):
 
     if st.session_state.stage == "selection":
 
+        st.write("Step 1: Select chapter and category")
+
         confirm_selection = st.form_submit_button('confirm selection')
 
         if confirm_selection:
             st.write(f"Selected chapter: {selected_parent}")
 
             selected_parent_id = taxo_table.filter(taxo_table.col('name')== selected_parent).to_pandas().values.tolist()[0][0]
-            editor_initial_data = load_editor_initial_data(selected_parent_id)
+            load_editor_initial_data(selected_parent_id)
 
             st.rerun()
 
     else:
-        st.header("Step 2: Edit Your Data")
+        st.write("Step 2: Edit Your Data")
+
+        if st.session_state.editor_initial_data is not None:
+            st.write(st.session_state.editor_initial_data)
 
         submit_data = st.form_submit_button('submit data')
     
